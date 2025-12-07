@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adithya's AI Assistant - Professional Chat Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #1a1d29;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2d3142;
+        }
+
+        .logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid #2d3142;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-section {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #8b92a7;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #e0e4ea;
+        }
+
+        .nav-item:hover {
+            background: #252936;
+        }
+
+        .nav-item.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .nav-item-icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .topbar {
+            height: 70px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            background: white;
+        }
+
+        .topbar-left h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .topbar-left p {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn-secondary {
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            background: #fafbfc;
+        }
+
+        .chat-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .message {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .message.user .avatar {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .message.assistant .avatar {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .message-wrapper {
+            flex: 1;
+            max-width: 75%;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .message-sender {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .message-content {
+            padding: 16px 18px;
+            border-radius: 12px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .message.user .message-content {
+            background: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-area {
+            padding: 24px 32px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-box textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+        }
+
+        .input-box textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .send-btn {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 0;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-screen h2 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .welcome-screen p {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .suggestion-card {
+            background: white;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .suggestion-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .suggestion-icon {
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .suggestion-text {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .media-preview {
+            margin-top: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .media-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .media-preview video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .media-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            border-radius: 8px;
+        }
+
+        .generating-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid #92400e;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .topbar {
+                padding: 0 16px;
+            }
+            
+            .chat-area, .input-area {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>
+                <div class="logo-icon">🤖</div>
+                Adithya's AI Assistant
+            </h1>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Navigation</div>
+            <div class="nav-item active">
+                <span class="nav-item-icon">💬</span>
+                Chat
+            </div>
+            <div class="nav-item">
+                <span class="nav-item-icon">🎨</span>
+                Image Generator
+            </div>
+            <div class="nav-item">
+                <span class="nav-item-icon">🎬</span>
+                Video Creator
+            </div>
+            <div class="nav-item">
+                <span class="nav-item-icon">📚</span>
+                Knowledge Base
+            </div>
+            <div class="nav-item">
+                <span class="nav-item-icon">⚙️</span>
+                Settings
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h2>Adithya's AI Chat Assistant</h2>
+                <p>Intelligent conversation platform</p>
+            </div>
+            <div class="topbar-right">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    Online
+                </div>
+                <button class="btn-secondary">Export Chat</button>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-screen">
+                    <h2>Welcome to Adithya's AI Assistant</h2>
+                    <p>Your professional AI-powered chat companion. Select a prompt below or type your own message.</p>
+                    
+                    <div class="suggestion-grid">
+                        <div class="suggestion-card" onclick="sendSuggestion('Generate an image for me')">
+                            <div class="suggestion-icon">🎨</div>
+                            <div class="suggestion-text">Create Image</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendSuggestion('Create a video about')">
+                            <div class="suggestion-icon">🎬</div>
+                            <div class="suggestion-text">Make Video</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendSuggestion('Help me draft a professional email')">
+                            <div class="suggestion-icon">✉️</div>
+                            <div class="suggestion-text">Draft Email</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendSuggestion('Explain a complex concept')">
+                            <div class="suggestion-icon">🎓</div>
+                            <div class="suggestion-text">Explain Concepts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <div class="input-container">
+                    <div class="input-box">
+                        <textarea id="messageInput" placeholder="Type your message..." rows="1" oninput="autoResize(this)" onkeydown="handleKeyDown(event)"></textarea>
+                    </div>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <span>Send</span>
+                        <span>→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const responses = {
+            greetings: [
+                "Good day! I'm here to assist you with your professional needs. How may I help you today?",
+                "Hello! Welcome to AI Assistant Pro. What would you like to discuss?",
+                "Greetings! I'm ready to help you with analysis, insights, or creative solutions. What's on your agenda?"
+            ],
+            professional: [
+                "I can help you with that. Let me provide a professional perspective: For business communications, it's essential to maintain clarity and professionalism while being concise. Would you like me to elaborate on any specific aspect?",
+                "That's an excellent question for professional development. In the business context, strategic thinking involves analyzing multiple perspectives. What specific area would you like to explore further?",
+                "From a professional standpoint, effective solutions often require a systematic approach. I'd be happy to help you break this down into actionable steps."
+            ],
+            analysis: [
+                "Based on current trends and industry standards, here are key insights: Market dynamics are constantly evolving, and staying informed is crucial. Would you like a detailed breakdown?",
+                "Let me provide an analytical perspective: Data-driven decision making is essential in today's business environment. I can help you understand the metrics that matter most.",
+                "From an analytical standpoint, we should consider multiple factors including market conditions, competitive landscape, and growth potential. What specific metrics interest you?"
+            ],
+            creative: [
+                "Let's explore some innovative approaches: Creativity in business often comes from combining existing ideas in new ways. Here are some strategic directions we could consider...",
+                "For creative problem-solving, I suggest we think outside conventional boundaries. Innovation often requires challenging assumptions. What's your vision?",
+                "Creative solutions emerge when we combine analytical thinking with innovative approaches. Let's brainstorm some possibilities that align with your objectives."
+            ],
+            email: [
+                "For professional email communication, I recommend a structure that includes: a clear subject line, concise opening, well-organized body content, and a specific call-to-action. What's the context of your email?",
+                "When drafting professional correspondence, tone and clarity are paramount. I can help you craft a message that's both professional and effective. Who is your intended audience?",
+                "Professional emails should balance formality with approachability. Let me help you structure a message that achieves your communication goals clearly and professionally."
+            ],
+            help: [
+                "I'm a professional AI assistant designed to help with: business analysis, professional communication, strategic planning, problem-solving, creative ideation, image generation, and video creation. How can I assist you today?",
+                "My capabilities include providing insights, drafting professional content, analyzing complex topics, creating images, generating videos, and offering strategic recommendations. What specific area interests you?",
+                "I specialize in professional consultation across various domains including business strategy, communication, analytical problem-solving, plus creative content like images and videos. What would you like to explore?"
+            ],
+            imageGeneration: [
+                "I'd be happy to help you create an image! Please describe what you'd like me to generate. For example: 'A sunset over mountains' or 'A modern office workspace'.",
+                "Great! I can generate custom images for you. What kind of image would you like? Describe the scene, style, colors, or mood you're looking for.",
+                "Let's create something visual! Tell me what you'd like to see - landscapes, abstract art, business graphics, or anything else you have in mind."
+            ],
+            videoCreation: [
+                "I can help you create video content! What's the topic or theme you'd like the video to be about? For example: product demo, explainer video, or creative animation.",
+                "Excellent! Let's make a video. What would you like it to feature? Tell me about the content, style, and purpose of the video.",
+                "Video creation coming up! Please describe what you want the video to show - this could be an animation, slideshow, or any creative concept you have."
+            ],
+            thanks: [
+                "You're very welcome. Feel free to reach out if you need further assistance.",
+                "My pleasure to assist you. Is there anything else I can help you with?",
+                "Happy to help! Don't hesitate to ask if you have additional questions."
+            ],
+            default: [
+                "That's an interesting point to consider. In a professional context, we'd want to examine this from multiple angles. Could you provide more details about what you're looking to achieve?",
+                "I appreciate you sharing that. To provide the most relevant insights, could you elaborate on the specific aspects you'd like me to address?",
+                "Thank you for that question. In my analysis, we should consider several factors. What particular dimension would you like to explore first?"
+            ]
+        };
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendSuggestion(text) {
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('sendBtn').disabled = true;
+
+            addMessage(message, 'user');
+            
+            showTyping();
+
+            setTimeout(() => {
+                removeTyping();
+                const response = generateResponse(message);
+                addMessage(response, 'assistant');
+                
+                // Check if request is for image or video generation
+                const lowerMessage = message.toLowerCase();
+                if (lowerMessage.match(/image|picture|photo|generate.*image|create.*image|draw/)) {
+                    setTimeout(() => {
+                        generateMedia('image', message);
+                    }, 1000);
+                } else if (lowerMessage.match(/video|animation|create.*video|make.*video/)) {
+                    setTimeout(() => {
+                        generateMedia('video', message);
+                    }, 1000);
+                }
+                
+                document.getElementById('sendBtn').disabled = false;
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function generateResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            if (lowerMessage.match(/^(hi|hello|hey|greetings|good morning|good afternoon|good evening)/)) {
+                return getRandomResponse(responses.greetings);
+            }
+
+            if (lowerMessage.match(/image|picture|photo|generate.*image|create.*image|draw|visual/)) {
+                return getRandomResponse(responses.imageGeneration);
+            }
+
+            if (lowerMessage.match(/video|animation|create.*video|make.*video|film|movie/)) {
+                return getRandomResponse(responses.videoCreation);
+            }
+
+            if (lowerMessage.match(/email|letter|correspondence|write|draft/)) {
+                return getRandomResponse(responses.email);
+            }
+
+            if (lowerMessage.match(/analysis|analyze|data|market|trend|insight/)) {
+                return getRandomResponse(responses.analysis);
+            }
+
+            if (lowerMessage.match(/creative|idea|innovation|brainstorm|think/)) {
+                return getRandomResponse(responses.creative);
+            }
+
+            if (lowerMessage.match(/help|assist|what can you|capabilities|what do you do/)) {
+                return getRandomResponse(responses.help);
+            }
+
+            if (lowerMessage.match(/thank|thanks|appreciate/)) {
+                return getRandomResponse(responses.thanks);
+            }
+
+            if (lowerMessage.match(/business|strategy|professional|corporate|enterprise/)) {
+                return getRandomResponse(responses.professional);
+            }
+
+            return getRandomResponse(responses.default);
+        }
+
+        function getRandomResponse(responseArray) {
+            return responseArray[Math.floor(Math.random() * responseArray.length)];
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatContainer');
+            const welcome = container.querySelector('.welcome-screen');
+            if (welcome) welcome.remove();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = sender === 'user' ? 'U' : 'AI';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            
+            const senderName = document.createElement('span');
+            senderName.className = 'message-sender';
+            senderName.textContent = sender === 'user' ? 'You' : 'Adithya\'s AI';
+            
+            const time = document.createElement('span');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            header.appendChild(senderName);
+            header.appendChild(time);
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+            
+            wrapper.appendChild(header);
+            wrapper.appendChild(content);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(wrapper);
+            container.appendChild(messageDiv);
+            
+            const chatArea = document.getElementById('chatArea');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant';
+            typingDiv.id = 'typing';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            
+            wrapper.appendChild(content);
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(wrapper);
+            container.appendChild(typingDiv);
+            
+            const chatArea = document.getElementById('chatArea');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+
+        function generateMedia(type, prompt) {
+            const container = document.getElementById('chatContainer');
+            
+            // Add generating message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.id = 'generatingMedia';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            
+            const senderName = document.createElement('span');
+            senderName.className = 'message-sender';
+            senderName.textContent = 'Adithya\'s AI';
+            
+            const time = document.createElement('span');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            header.appendChild(senderName);
+            header.appendChild(time);
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const generatingBadge = document.createElement('div');
+            generatingBadge.className = 'generating-badge';
+            generatingBadge.innerHTML = `<div class="spinner"></div> Generating ${type}...`;
+            
+            content.appendChild(generatingBadge);
+            
+            const mediaPlaceholder = document.createElement('div');
+            mediaPlaceholder.className = 'media-placeholder';
+            mediaPlaceholder.textContent = type === 'image' ? '🎨' : '🎬';
+            
+            const mediaPreview = document.createElement('div');
+            mediaPreview.className = 'media-preview';
+            mediaPreview.appendChild(mediaPlaceholder);
+            
+            content.appendChild(mediaPreview);
+            
+            wrapper.appendChild(header);
+            wrapper.appendChild(content);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(wrapper);
+            container.appendChild(messageDiv);
+            
+            const chatArea = document.getElementById('chatArea');
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // Simulate generation complete
+            setTimeout(() => {
+                generatingBadge.innerHTML = `✓ ${type === 'image' ? 'Image' : 'Video'} generated successfully`;
+                generatingBadge.style.background = '#d1fae5';
+                generatingBadge.style.color = '#065f46';
+                
+                if (type === 'image') {
+                    // Create sample image using canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 800;
+                    canvas.height = 450;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Create gradient
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                    gradient.addColorStop(0, '#667eea');
+                    gradient.addColorStop(1, '#764ba2');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add text
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 48px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('AI Generated Image', canvas.width/2, canvas.height/2 - 20);
+                    ctx.font = '24px Arial';
+                    ctx.fillText(prompt.substring(0, 50), canvas.width/2, canvas.height/2 + 30);
+                    
+                    const img = document.createElement('img');
+                    img.src = canvas.toDataURL();
+                    img.alt = 'Generated image';
+                    mediaPlaceholder.replaceWith(img);
+                } else {
+                    // Create sample video placeholder
+                    mediaPlaceholder.innerHTML = '<div style="padding: 60px; text-align: center;"><div style="font-size: 64px; margin-bottom: 20px;">🎬</div><div style="font-size: 18px; color: white;">Video: ' + prompt.substring(0, 40) + '</div><div style="font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 10px;">Duration: 0:30</div></div>';
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
